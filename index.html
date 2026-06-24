@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ONE WORLD TRADE HUB - 物流对账与开单系统</title>
+    <title>ONE WORLD TRADE HUB - AR Tracking & Billing System</title>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -21,7 +21,7 @@
             color: #333;
         }
         .container {
-            max-width: 1300px;
+            max-width: 1350px;
             margin: 0 auto;
         }
         header {
@@ -34,7 +34,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        header h1 { margin: 0; font-size: 24px; }
+        header h1 { margin: 0; font-size: 24px; letter-spacing: 0.5px; }
         .tabs {
             display: flex;
             gap: 10px;
@@ -63,7 +63,7 @@
         }
         .panel.active { display: block; }
         
-        /* 统计卡片 */
+        /* Summary Cards */
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -81,7 +81,7 @@
         .card.outstanding { background-color: var(--danger-color); }
         .card div { font-size: 22px; margin-top: 5px; }
 
-        /* 表单布局 */
+        /* Form Layout */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -93,7 +93,7 @@
             margin-bottom: 25px;
         }
         .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 5px; font-weight: 600; font-size: 13px; }
+        .form-group label { margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #555; }
         input, select, textarea {
             padding: 8px 12px;
             border: 1px solid #ccc;
@@ -109,18 +109,18 @@
         }
         .btn-submit { background-color: var(--success-color); color: white; grid-column: 1 / -1; justify-self: end; }
 
-        /* 表格样式 */
+        /* Table Styles */
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
         th, td { padding: 10px 12px; border-bottom: 1px solid #e1e8ed; text-align: left; }
         th { background-color: #f8f9fa; color: #555; font-weight: 600; }
         tr:hover { background-color: #fdfdfd; }
-        .badge { padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+        .badge { padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; display: inline-block; }
         .badge-done { background: #d4edda; color: #155724; }
         .badge-pending { background: #fff3cd; color: #856404; }
         .badge-overdue { background: #f8d7da; color: #721c24; }
 
-        /* 开单预览 */
+        /* Invoice Preview */
         .invoice-container {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
@@ -148,60 +148,60 @@
     <header>
         <div>
             <h1>ONE WORLD TRADE HUB SDN. BHD.</h1>
-            <small>应收账款追踪与应收凭单系统</small>
+            <small>Accounts Receivable Logistics Dashboard & Billing Tool</small>
         </div>
-        <div style="text-align: right; font-size: 14px;">系统时间: 2026年</div>
+        <div style="text-align: right; font-size: 14px;">System Year: 2026</div>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('ar-tracker', this)">Accounts Receivable (应收对账)</button>
-        <button class="tab-btn" onclick="switchTab('billing', this)">Invoice Generator (快捷开单)</button>
+        <button class="tab-btn active" onclick="switchTab('ar-tracker', this)">Accounts Receivable Ledger</button>
+        <button class="tab-btn" onclick="switchTab('billing', this)">Invoice Generator</button>
     </div>
 
     <div id="ar-tracker" class="panel active">
         <div class="summary-grid">
-            <div class="card total">应收总额 (含SST)<div id="stat-total">RM 0.00</div></div>
-            <div class="card received">已收总额<div id="stat-received">RM 0.00</div></div>
-            <div class="card outstanding">未收尾款 (Outstanding)<div id="stat-outstanding">RM 0.00</div></div>
+            <div class="card total">Total Receivables (Inc. SST)<div id="stat-total">RM 0.00</div></div>
+            <div class="card received">Total Received<div id="stat-received">RM 0.00</div></div>
+            <div class="card outstanding">Amount Outstanding<div id="stat-outstanding">RM 0.00</div></div>
         </div>
 
-        <h3>📝 录入新发票 / 账目</h3>
+        <h3>📝 Record New Invoice</h3>
         <form id="ar-form" onsubmit="saveRecord(event)">
             <div class="form-grid">
-                <div class="form-group"><label>客户名称 (Customer Name)</label><input type="text" id="custName" required></div>
-                <div class="form-group"><label>发票号 (Invoice #)</label><input type="text" id="invNo" placeholder="如 INV-2026001" required></div>
-                <div class="form-group"><label>发票日期 (Invoice Date)</label><input type="date" id="invDate" required></div>
-                <div class="form-group"><label>发票金额 (不含SST)</label><input type="number" step="0.01" id="invAmt" oninput="calcSST()" required></div>
+                <div class="form-group"><label>Customer Name</label><input type="text" id="custName" required></div>
+                <div class="form-group"><label>Invoice #</label><input type="text" id="invNo" placeholder="e.g. INV-2023001" required></div>
+                <div class="form-group"><label>Invoice Date</label><input type="date" id="invDate" required></div>
+                <div class="form-group"><label>Invoice Amount (Excl. SST)</label><input type="number" step="0.01" id="invAmt" oninput="calcSST()" required></div>
                 <div class="form-group"><label>6% SST</label><input type="number" step="0.01" id="invSST" readonly></div>
-                <div class="form-group"><label>集装箱数量 (Containers)</label><input type="number" id="containers" value="0"></div>
-                <div class="form-group"><label>趟数车次 (Trips)</label><input type="number" id="trips" value="0"></div>
-                <div class="form-group"><label>付款账期 (Terms 天数)</label><input type="number" id="terms" value="30" required></div>
-                <div class="form-group"><label>已收金额 (Amount Received)</label><input type="number" step="0.01" id="amtRec" value="0"></div>
-                <div class="form-group"><label>收款日期 (Date Received)</label><input type="date" id="dateRec"></div>
-                <div class="form-group"><label>备注 (Remarks)</label><input type="text" id="remarks"></div>
-                <button type="submit" class="btn btn-submit">保存账目至系统</button>
+                <div class="form-group"><label>Containers Count</label><input type="number" id="containers" value="0"></div>
+                <div class="form-group"><label>Trips Count</label><input type="number" id="trips" value="0"></div>
+                <div class="form-group"><label>Payment Terms (Days)</label><input type="number" id="terms" value="30" required></div>
+                <div class="form-group"><label>Amount Received</label><input type="number" step="0.01" id="amtRec" value="0"></div>
+                <div class="form-group"><label>Date Received</label><input type="date" id="dateRec"></div>
+                <div class="form-group"><label>Remarks</label><input type="text" id="remarks"></div>
+                <button type="submit" class="btn btn-submit">Save Record to Ledger</button>
             </div>
         </form>
 
-        <h3>📋 应收账款明细台账 (Accounts Receivable Aging Table)</h3>
+        <h3>📋 Accounts Receivable Aging Table</h3>
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th>客户名称</th>
-                        <th>发票号</th>
-                        <th>发票日期</th>
-                        <th>发票金额</th>
+                        <th>Customer Name</th>
+                        <th>Invoice #</th>
+                        <th>Invoice Date</th>
+                        <th>Amount (Excl.)</th>
                         <th>6% SST</th>
-                        <th>总金额(含税)</th>
-                        <th>柜数/车次</th>
-                        <th>到期日</th>
-                        <th>已收金额</th>
-                        <th>未收尾款</th>
-                        <th>账龄(逾期天数)</th>
-                        <th>状态</th>
-                        <th>备注</th>
-                        <th>操作</th>
+                        <th>Total (Incl.)</th>
+                        <th>Containers / Trips</th>
+                        <th>Due Date</th>
+                        <th>Amt Received</th>
+                        <th>Outstanding</th>
+                        <th>Days Past Due</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="ar-table-body"></tbody>
@@ -212,50 +212,50 @@
     <div id="billing" class="panel">
         <div class="invoice-container">
             <div>
-                <h3>🛠️ 快速开具 Invoice</h3>
+                <h3>🛠️ Create Invoice</h3>
                 <div class="form-grid" style="grid-template-columns: 1fr;">
-                    <div class="form-group"><label>客户公司名称 (Bill To)</label><input type="text" id="bill-cust" placeholder="Client Company Sdn Bhd"></div>
-                    <div class="form-group"><label>业务款项描述 (Description)</label><input type="text" id="bill-desc" placeholder="Logistics & Transportation Charges"></div>
-                    <div class="form-group"><label>集装箱/车次详情 (Details)</label><input type="text" id="bill-details" placeholder="e.g. 2 Containers / 5 Trips"></div>
-                    <div class="form-group"><label>小计金额 (Subtotal RM)</label><input type="number" step="0.01" id="bill-subtotal" oninput="previewInvoice()"></div>
-                    <div class="form-group"><label>是否计 6% SST</label>
+                    <div class="form-group"><label>Bill To (Customer Name)</label><input type="text" id="bill-cust" placeholder="Client Company Sdn Bhd"></div>
+                    <div class="form-group"><label>Description of Services</label><input type="text" id="bill-desc" placeholder="Logistics & Transportation Charges"></div>
+                    <div class="form-group"><label>Quantity / Job Details</label><input type="text" id="bill-details" placeholder="e.g. 2 Containers / 5 Trips"></div>
+                    <div class="form-group"><label>Subtotal (RM)</label><input type="number" step="0.01" id="bill-subtotal" oninput="previewInvoice()"></div>
+                    <div class="form-group"><label>Apply 6% SST</label>
                         <select id="bill-sst-opt" onchange="previewInvoice()">
-                            <option value="yes">计算 6% SST</option>
-                            <option value="no">豁免/不计算</option>
+                            <option value="yes">Charge 6% SST</option>
+                            <option value="no">Exempted / No SST</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>银行收款账户与备注 (Payment Info)</label>
-                        <textarea id="bill-bank" rows="4">Bank: Maybank&#10;Account Name: ONE WORLD TRADE HUB SDN. BHD.&#10;Account No: XXXXXXXXXX&#10;Terms: 30 Days</textarea>
+                    <div class="form-group"><label>Payment Terms & Bank Details</label>
+                        <textarea id="bill-bank" rows="5">Bank: Maybank&#10;Account Name: ONE WORLD TRADE HUB SDN. BHD.&#10;Account No: XXXXXXXXXX&#10;Payment Terms: 30 Days</textarea>
                     </div>
-                    <button onclick="window.print()" class="btn" style="background: var(--primary-color); color:white;">🖨️ 打印或导出为 PDF</button>
+                    <button onclick="window.print()" class="btn" style="background: var(--primary-color); color:white;">🖨️ Print or Save as PDF</button>
                 </div>
             </div>
 
             <div>
-                <h3>🔍 实时发票预览 (A4 标准)</h3>
+                <h3>🔍 Real-time Invoice Preview (Standard A4)</h3>
                 <div class="invoice-preview" id="inv-print-area">
                     <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                        <h2 style="margin: 0; font-size: 20px; letter-spacing: 1px;">ONE WORLD TRADE HUB SDN. BHD.</h2>
-                        <p style="margin: 5px 0 0 0; font-size: 11px;">马来西亚专业物流与贸易贸易服务商</p>
+                        <h2 style="margin: 0; font-size: 20px; letter-spacing: 0.5px;">ONE WORLD TRADE HUB SDN. BHD.</h2>
+                        <p style="margin: 5px 0 0 0; font-size: 11px;">International Trade Logistics & Transport Services</p>
                     </div>
                     
                     <div class="inv-row">
                         <div>
-                            <strong>致 (BILL TO):</strong>
+                            <strong>BILL TO:</strong>
                             <div id="p-cust" style="margin-top:5px; font-weight: bold;">-</div>
                         </div>
                         <div style="text-align: right; font-size: 13px;">
-                            <h3 style="margin:0; color:#333;">INVOICE</h3>
-                            <div>单号: <span id="p-inv-no">---</span></div>
-                            <div>日期: <span id="p-date">---</span></div>
+                            <h3 style="margin:0; color:#333; letter-spacing: 1px;">INVOICE</h3>
+                            <div>Inv No: <span id="p-inv-no">---</span></div>
+                            <div>Date: <span id="p-date">---</span></div>
                         </div>
                     </div>
 
                     <table style="margin-top: 30px; margin-bottom: 20px; border-top: 1px solid #000;">
                         <thead>
                             <tr style="border-bottom: 1px solid #000;">
-                                <th>项目描述 (Description)</th>
-                                <th style="text-align: right; width: 120px;">金额 (RM)</th>
+                                <th>Description</th>
+                                <th style="text-align: right; width: 120px;">Amount (RM)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -275,14 +275,14 @@
                                 <td id="p-sst" style="text-align: right;">0.00</td>
                             </tr>
                             <tr style="border-top: 1px solid #000; font-size: 15px;">
-                                <td style="text-align: right; font-weight: bold;">总计额 (TOTAL DUE):</td>
+                                <td style="text-align: right; font-weight: bold;">TOTAL DUE:</td>
                                 <td id="p-grand" style="text-align: right; font-weight: bold;">0.00</td>
                             </tr>
                         </tbody>
                     </table>
 
                     <div style="margin-top: 40px; font-size: 12px; border-top: 1px solid #ddd; padding-top: 10px;">
-                        <strong>付款条款 & 银行账户 (Payment Terms):</strong>
+                        <strong>Payment Terms & Banking Information:</strong>
                         <div id="p-bank" style="white-space: pre-line; margin-top: 5px; color:#333;"></div>
                     </div>
                 </div>
@@ -292,7 +292,7 @@
 </div>
 
 <script>
-    // 标签页切换
+    // Tab switching logic
     function switchTab(panelId, btn) {
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -301,13 +301,13 @@
         if(panelId === 'billing') previewInvoice();
     }
 
-    // 自动算税
+    // Auto-calculate 6% SST
     function calcSST() {
         const amt = parseFloat(document.getElementById('invAmt').value) || 0;
         document.getElementById('invSST').value = (amt * 0.06).toFixed(2);
     }
 
-    // --- 核心对账数据处理 ---
+    // --- Core Ledger Logic ---
     let arData = JSON.parse(localStorage.getItem('owth_ar_data')) || [];
 
     function renderARTable() {
@@ -324,7 +324,7 @@
             const rec = parseFloat(item.amtRec) || 0;
             const outstanding = grandTotal - rec;
 
-            // 计算到期日和超期天数
+            // Calculate Due Date and Aging Days
             const idate = new Date(item.invDate);
             const ddate = new Date(idate.getTime() + (parseInt(item.terms) * 24 * 60 * 60 * 1000));
             const dueDateStr = ddate.toISOString().split('T')[0];
@@ -335,15 +335,15 @@
                 agingDays = diffTime > 0 ? Math.floor(diffTime / (1000 * 60 * 60 * 24)) : 0;
             }
 
-            // 统计累加
+            // Calculations for metrics cards
             totalAll += grandTotal;
             totalRec += rec;
             totalOut += outstanding;
 
-            // 状态标签
-            let statusBadge = '<span class="badge badge-done">DONE (已结清)</span>';
+            // Status badges
+            let statusBadge = '<span class="badge badge-done">PAID</span>';
             if (outstanding > 0.01) {
-                statusBadge = agingDays > 0 ? `<span class="badge badge-danger">OVERDUE 逾期 ${agingDays} 天</span>` : '<span class="badge badge-pending">PENDING 账期内</span>';
+                statusBadge = agingDays > 0 ? `<span class="badge badge-overdue">OVERDUE (${agingDays} Days)</span>` : '<span class="badge badge-pending">PENDING</span>';
             }
 
             const row = document.createElement('tr');
@@ -354,19 +354,19 @@
                 <td>${amt.toFixed(2)}</td>
                 <td>${sst.toFixed(2)}</td>
                 <td style="font-weight:bold;">${grandTotal.toFixed(2)}</td>
-                <td>${item.containers} 柜 / ${item.trips} 车</td>
+                <td>${item.containers} Vol / ${item.trips} Trips</td>
                 <td>${dueDateStr}</td>
                 <td style="color:var(--success-color);">${rec.toFixed(2)}</td>
                 <td style="color:var(--danger-color); font-weight:bold;">${outstanding.toFixed(2)}</td>
                 <td>${outstanding > 0.01 ? agingDays : 0}</td>
                 <td>${statusBadge}</td>
                 <td><small>${item.remarks || ''}</small></td>
-                <td><button onclick="deleteRecord(${index})" style="color:var(--danger-color); border:none; background:none; cursor:pointer;">删除</button></td>
+                <td><button onclick="deleteRecord(${index})" style="color:var(--danger-color); border:none; background:none; cursor:pointer;">Delete</button></td>
             `;
             tbody.appendChild(row);
         });
 
-        // 更新顶部总览卡片
+        // Update top status metric blocks
         document.getElementById('stat-total').innerText = 'RM ' + totalAll.toFixed(2);
         document.getElementById('stat-received').innerText = 'RM ' + totalRec.toFixed(2);
         document.getElementById('stat-outstanding').innerText = 'RM ' + totalOut.toFixed(2);
@@ -395,13 +395,13 @@
     }
 
     function deleteRecord(index) {
-        if(confirm('确定要删除这条账目记录吗？')) {
+        if(confirm('Are you sure you want to delete this invoice record?')) {
             arData.splice(index, 1);
             renderARTable();
         }
     }
 
-    // --- 开单预览实时刷新 ---
+    // --- Billing Engine Preview ---
     function previewInvoice() {
         const sub = parseFloat(document.getElementById('bill-subtotal').value) || 0;
         const sstOpt = document.getElementById('bill-sst-opt').value;
@@ -417,13 +417,13 @@
         document.getElementById('p-grand').innerText = grand.toFixed(2);
         document.getElementById('p-bank').innerText = document.getElementById('bill-bank').value;
 
-        // 固定的实时开单凭证号
+        // Dynamic auto invoice metadata generation
         const t = new Date();
-        document.getElementById('p-date').innerText = t.toLocaleDateString();
+        document.getElementById('p-date').innerText = t.toLocaleDateString('en-MY');
         document.getElementById('p-inv-no').innerText = 'INV-' + t.getFullYear() + (t.getMonth()+1).toString().padStart(2,'0') + t.getDate().toString().padStart(2,'0') + '-' + t.getTime().toString().slice(-4);
     }
 
-    // 页面初次加载渲染
+    // Initial page load trigger
     renderARTable();
 </script>
 </body>
