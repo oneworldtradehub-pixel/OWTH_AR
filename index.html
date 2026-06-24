@@ -110,10 +110,10 @@
         .btn-submit { background-color: var(--success-color); color: white; grid-column: 1 / -1; justify-self: end; }
 
         /* Table Styles */
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        .table-wrapper { overflow-x: auto; max-height: 500px; border: 1px solid #e1e8ed; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 10px 12px; border-bottom: 1px solid #e1e8ed; text-align: left; }
-        th { background-color: #f8f9fa; color: #555; font-weight: 600; }
+        th { background-color: #f8f9fa; color: #555; font-weight: 600; position: sticky; top: 0; z-index: 5; }
         tr:hover { background-color: #fdfdfd; }
         .badge { padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; display: inline-block; }
         .badge-done { background: #d4edda; color: #155724; }
@@ -131,16 +131,10 @@
             margin-top: 20px;
             font-size: 11px;
         }
-        .logistics-meta-grid div {
-            line-height: 1.6;
-        }
+        .logistics-meta-grid div { line-height: 1.6; }
 
         /* Invoice Editable Design */
-        .invoice-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
+        .invoice-container { display: grid; grid-template-columns: 1fr; gap: 30px; }
         .editable-invoice-body {
             border: 2px dashed #3498db;
             padding: 40px;
@@ -150,40 +144,16 @@
             position: relative;
             border-radius: 4px;
         }
-        .editable-invoice-body [contenteditable="true"]:hover {
-            background-color: #f0f7fc;
-            outline: 1px dashed #3498db;
-        }
-        .editable-invoice-body [contenteditable="true"]:focus {
-            background-color: #fff;
-            outline: 2px solid #3498db;
-        }
+        .editable-invoice-body [contenteditable="true"]:hover { background-color: #f0f7fc; outline: 1px dashed #3498db; }
+        .editable-invoice-body [contenteditable="true"]:focus { background-color: #fff; outline: 2px solid #3498db; }
         .inv-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .edit-hint {
-            background: #e8f4fd;
-            color: #2980b9;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 13px;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
+        .edit-hint { background: #e8f4fd; color: #2980b9; padding: 10px; border-radius: 4px; font-size: 13px; margin-bottom: 15px; font-weight: bold; }
         
         @media print {
             body * { visibility: hidden; }
             .editable-invoice-body, .editable-invoice-body * { visibility: visible; }
-            .editable-invoice-body { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                border: none !important; 
-                padding: 0; 
-            }
-            .editable-invoice-body [contenteditable="true"] {
-                background: transparent !important;
-                outline: none !important;
-            }
+            .editable-invoice-body { position: absolute; left: 0; top: 0; width: 100%; border: none !important; padding: 0; }
+            .editable-invoice-body [contenteditable="true"] { background: transparent !important; outline: none !important; }
             .no-print { display: none !important; }
             @page { margin: 1cm; }
         }
@@ -197,16 +167,15 @@
             <h1>ONE WORLD TRADE HUB SDN. BHD.</h1>
             <small>Accounts Receivable Logistics Dashboard & Billing Tool</small>
         </div>
-        <div style="text-align: right; font-size: 14px;">System Year: 2026</div>
+        <div style="text-align: right; font-size: 14px;">System Dashboard</div>
     </header>
 
     <div class="tabs no-print">
-        <button class="tab-btn" onclick="switchTab('ar-tracker', this)">Accounts Receivable Ledger</button>
-        <button class="tab-btn active" onclick="switchTab('billing', this)">Invoice Generator (Data Loaded)</button>
+        <button class="tab-btn active" onclick="switchTab('ar-tracker', this)">Accounts Receivable Ledger (History Loaded)</button>
+        <button class="tab-btn" onclick="switchTab('billing', this)">Invoice Generator</button>
     </div>
 
-    <!-- 1. Accounts Receivable Panel -->
-    <div id="ar-tracker" class="panel">
+    <div id="ar-tracker" class="panel active">
         <div class="summary-grid">
             <div class="card total">Total Receivables (Inc. SST)<div id="stat-total">RM 0.00</div></div>
             <div class="card received">Total Received<div id="stat-received">RM 0.00</div></div>
@@ -216,11 +185,11 @@
         <h3>📝 Record New Invoice</h3>
         <form id="ar-form" onsubmit="saveRecord(event)">
             <div class="form-grid">
-                <div class="form-group"><label>Customer Name</label><input type="text" id="custName" required></div>
+                <div class="form-group"><label>Customer Name</label><input type="text" id="custName" value="MC MULTI SUPPLIES SDN BHD" required></div>
                 <div class="form-group"><label>Invoice #</label><input type="text" id="invNo" placeholder="e.g. INV-2026734" required></div>
                 <div class="form-group"><label>Invoice Date</label><input type="date" id="invDate" required></div>
                 <div class="form-group"><label>Invoice Amount (Excl. SST)</label><input type="number" step="0.01" id="invAmt" oninput="calcSST()" required></div>
-                <div class="form-group"><label>6% SST</label><input type="number" step="0.01" id="invSST" readonly></div>
+                <div class="form-group"><label>6% SST</label><input type="number" step="0.01" id="invSST" readonly value="0.00"></div>
                 <div class="form-group"><label>Containers Count</label><input type="number" id="containers" value="0"></div>
                 <div class="form-group"><label>Trips Count</label><input type="number" id="trips" value="0"></div>
                 <div class="form-group"><label>Payment Terms (Days)</label><input type="number" id="terms" value="30" required></div>
@@ -231,7 +200,10 @@
             </div>
         </form>
 
-        <h3>📋 Accounts Receivable Aging Table</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <h3>📋 Accounts Receivable Aging Table</h3>
+            <button class="btn no-print" onclick="resetToHistoryDefault()" style="background-color: var(--danger-color); color: white; font-size: 12px; padding: 6px 12px;">🔄 Reset Ledger to Historical Data</button>
+        </div>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -257,20 +229,17 @@
         </div>
     </div>
 
-    <!-- 2. Invoice Generator Panel (Upgraded with Multi-item Forwarding Support) -->
-    <div id="billing" class="panel active">
+    <div id="billing" class="panel">
         <div class="invoice-container">
-            
             <div class="no-print" style="margin-bottom: 15px; display: flex; gap: 10px;">
                 <button onclick="window.print()" class="btn" style="background: var(--success-color); color:white; font-size: 16px; padding: 12px 30px;">🖨️ Print / Save Invoice as PDF</button>
                 <button onclick="syncToLedger()" class="btn" style="background: #2980b9; color:white; font-size: 16px; padding: 12px 20px;">💾 Sync totals to Ledger Panel</button>
             </div>
 
             <div>
-                <div class="edit-hint no-print">💡 Live Preview Mode: You can directly click and modify ANY text inside the blue dashed box below before printing!</div>
+                <div class="edit-hint no-print">💡 Live Preview Mode: You can directly click and modify ANY text inside the blue dashed box below. Bottom totals recalculate instantly!</div>
                 
                 <div class="editable-invoice-body" id="inv-print-area">
-                    <!-- Header Text -->
                     <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
                         <div>
                             <h2 contenteditable="true" style="margin: 0; font-size: 22px; letter-spacing: 0.5px; font-weight: bold;">ONE WORLD TRADE HUB SDN. BHD.</h2>
@@ -285,7 +254,6 @@
                         </div>
                     </div>
                     
-                    <!-- Metadata Block -->
                     <div class="inv-row" style="font-size: 12px;">
                         <div style="width: 50%;">
                             <strong style="font-size: 13px;">BILL TO:</strong>
@@ -305,7 +273,6 @@
                         </div>
                     </div>
 
-                    <!-- Logistics Forwarding Specific Data Fields -->
                     <div class="logistics-meta-grid" contenteditable="true">
                         <div>
                             <strong>VESSEL ID/NAME/VOY:</strong> V.26115<br>
@@ -320,14 +287,18 @@
                         <div>
                             <strong>SHIPPER:</strong> SHANXI BOWEIGUANG COMMERCIAL AND TRADE CO.,LTD<br>
                             <strong>CONSIGNEE:</strong> MC MULTI SUPPLIES SDN BHD<br>
-                            <strong>CARGO DESC:</strong> WATER REDUCER (BWG-2026-50010)
+                            <strong>CARGO DESC:</strong> WATER REDUCER
                         </div>
                         <div style="grid-column: 1 / -1; border-top: 1px dashed #ccc; padding-top: 5px; margin-top: 5px;">
                             <strong>CONTAINER / SEAL NO:</strong> HPCU2967910 (20GP), TIIU2402385 (20GP) | <strong>PORT OPERATOR ETA:</strong> 29/05/2026
                         </div>
                     </div>
 
-                    <!-- Items & Calculations Table -->
+                    <div class="no-print" style="margin-top: 20px; margin-bottom: -10px; display: flex; gap: 10px;">
+                        <button onclick="addInvoiceRow()" class="btn" style="background: #3498db; color: white; font-size: 13px; padding: 6px 14px;">➕ 添加新项目行</button>
+                        <button onclick="deleteLastInvoiceRow()" class="btn" style="background: #e74c3c; color: white; font-size: 13px; padding: 6px 14px;">❌ 删除最后一项</button>
+                    </div>
+
                     <table style="margin-top: 20px; margin-bottom: 20px; border-top: 2px solid #000; border-bottom: 2px solid #000;">
                         <thead>
                             <tr style="border-bottom: 1px solid #000; background: #f8f9fa;">
@@ -343,26 +314,12 @@
                             </tr>
                         </thead>
                         <tbody id="invoice-items-tbody" contenteditable="true" oninput="recalculateInvoiceTable()">
-                            <!-- Generated Rows From Source Data -->
                             <tr><td>1</td><td>FORWARDING FEE</td><td style="text-align: right;">2.00</td><td style="text-align: center;">CONT</td><td style="text-align: center;">MYR</td><td style="text-align: right;">285.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">34.20</td><td style="text-align: right; font-weight: bold;">570.00</td></tr>
                             <tr><td>2</td><td>CUSTOM DOCUMENTATION</td><td style="text-align: right;">1.00</td><td style="text-align: center;">SET</td><td style="text-align: center;">MYR</td><td style="text-align: right;">70.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">4.20</td><td style="text-align: right; font-weight: bold;">70.00</td></tr>
                             <tr><td>3</td><td>CUSTOM SCANNING</td><td style="text-align: right;">2.00</td><td style="text-align: center;">CONT</td><td style="text-align: center;">MYR</td><td style="text-align: right;">70.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">8.40</td><td style="text-align: right; font-weight: bold;">140.00</td></tr>
-                            <tr><td>4</td><td>HANDLING CHARGES</td><td style="text-align: right;">1.00</td><td style="text-align: center;">JOB</td><td style="text-align: center;">MYR</td><td style="text-align: right;">500.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">30.00</td><td style="text-align: right; font-weight: bold;">500.00</td></tr>
-                            <tr><td>5</td><td>AGENCY FEE</td><td style="text-align: right;">1.00</td><td style="text-align: center;">JOB</td><td style="text-align: center;">MYR</td><td style="text-align: right;">230.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">13.80</td><td style="text-align: right; font-weight: bold;">230.00</td></tr>
-                            <tr><td>6</td><td>SHIPPING CHARGES</td><td style="text-align: right;">1.00</td><td style="text-align: center;">JOB</td><td style="text-align: center;">MYR</td><td style="text-align: right;">1245.50</td><td style="text-align: center;">SV06</td><td style="text-align: right;">74.73</td><td style="text-align: right; font-weight: bold;">1245.50</td></tr>
-                            <tr><td>7</td><td>CRM</td><td style="text-align: right;">1.00</td><td style="text-align: center;">SET</td><td style="text-align: center;">MYR</td><td style="text-align: right;">45.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">2.70</td><td style="text-align: right; font-weight: bold;">45.00</td></tr>
-                            <tr><td>8</td><td>CUSTOM HANDLING</td><td style="text-align: right;">2.00</td><td style="text-align: center;">CONT</td><td style="text-align: center;">MYR</td><td style="text-align: right;">360.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">43.20</td><td style="text-align: right; font-weight: bold;">720.00</td></tr>
-                            <tr><td>9</td><td>SMK (DATA PROCESSING FEE)</td><td style="text-align: right;">1.00</td><td style="text-align: center;">SET</td><td style="text-align: center;">MYR</td><td style="text-align: right;">45.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">2.70</td><td style="text-align: right; font-weight: bold;">45.00</td></tr>
-                            <tr><td>10</td><td>EDI FEE</td><td style="text-align: right;">1.00</td><td style="text-align: center;">SET</td><td style="text-align: center;">MYR</td><td style="text-align: right;">65.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">3.90</td><td style="text-align: right; font-weight: bold;">65.00</td></tr>
-                            <tr><td>11</td><td>HAULAGE CHARGE -TENOM, SABAH</td><td style="text-align: right;">2.00</td><td style="text-align: center;">CONT</td><td style="text-align: center;">MYR</td><td style="text-align: right;">3500.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">420.00</td><td style="text-align: right; font-weight: bold;">7000.00</td></tr>
-                            <tr><td>12</td><td>PORT STORAGE</td><td style="text-align: right;">8.00</td><td style="text-align: center;">DAYS</td><td style="text-align: center;">MYR</td><td style="text-align: right;">30.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">14.40</td><td style="text-align: right; font-weight: bold;">240.00</td></tr>
-                            <tr><td>13</td><td>REMOVAL CHARGES</td><td style="text-align: right;">2.00</td><td style="text-align: center;">CONT</td><td style="text-align: center;">MYR</td><td style="text-align: right;">45.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">5.40</td><td style="text-align: right; font-weight: bold;">90.00</td></tr>
-                            <tr><td>14</td><td>OPERATION RECOVERY SURCHARGE</td><td style="text-align: right;">4.00</td><td style="text-align: center;">CONT</td><td style="text-align: center;">MYR</td><td style="text-align: right;">100.00</td><td style="text-align: center;">ZER</td><td style="text-align: right;">0.00</td><td style="text-align: right; font-weight: bold;">400.00</td></tr>
-                            <tr><td>15</td><td>DEMURRAGE & DETENTION CHARGES</td><td style="text-align: right;">2.00</td><td style="text-align: center;">JOB</td><td style="text-align: center;">MYR</td><td style="text-align: right;">150.00</td><td style="text-align: center;">SV06</td><td style="text-align: right;">18.00</td><td style="text-align: right; font-weight: bold;">300.00</td></tr>
                         </tbody>
                     </table>
 
-                    <!-- Summary Block -->
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div style="font-size: 11px; line-height: 1.5; color: #444;">
                             <strong style="color: #000;">Beneficiary:</strong> ONE WORLD TRADE HUB SDN. BHD.<br>
@@ -372,25 +329,13 @@
                             <span style="font-style: italic; display:block; margin-top:10px;">*THIS IS COMPUTER GENERATED INVOICE, NO SIGNATURE REQUIRED</span>
                         </div>
                         <div style="width: 300px; font-size: 13px;">
-                            <div class="inv-row"><span>Total Excl. Tax (RM):</span><span id="p-subtotal" style="font-weight: bold;">11,660.50</span></div>
-                            <div class="inv-row"><span>Add Tax (SST 6%):</span><span id="p-sst" style="font-weight: bold;">675.63</span></div>
+                            <div class="inv-row"><span>Total Excl. Tax (RM):</span><span id="p-subtotal" style="font-weight: bold;">780.00</span></div>
+                            <div class="inv-row"><span>Add Tax (SST 6%):</span><span id="p-sst" style="font-weight: bold;">46.80</span></div>
                             <div class="inv-row" style="border-top: 1px solid #000; font-size: 15px; font-weight: bold; padding-top: 5px;">
-                                <span>Total Incl. Tax (RM):</span><span id="p-grand" style="color:var(--danger-color)">12,336.13</span>
+                                <span>Total Incl. Tax (RM):</span><span id="p-grand" style="color:var(--danger-color)">826.80</span>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Sign-off Block -->
-                    <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 12px;">
-                        <div style="border-top: 1px solid #000; width: 250px; padding-top: 5px; text-align: center; margin-top: 40px;">
-                            We confirm the order by accepting terms & conditions.<br><strong>Chop & Sign</strong>
-                        </div>
-                        <div style="width: 250px; line-height: 2;">
-                            <div>Person in charge: _________________</div>
-                            <div>Date: _________________________</div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -398,6 +343,26 @@
 </div>
 
 <script>
+    // 注入提取自历史账目工作簿的2023经典底单数据
+    const historicalDefaultRecords = [
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023001", invDate: "2023-03-28", invAmt: "8727.55", invSST: "0.00", containers: "7", trips: "0", terms: "0", amtRec: "8727.55", dateRec: "2023-03-29", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023002", invDate: "2023-04-12", invAmt: "7595.00", invSST: "0.00", containers: "2", trips: "0", terms: "60", amtRec: "7595.00", dateRec: "2023-06-27", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023003", invDate: "2023-04-12", invAmt: "1800.00", invSST: "0.00", containers: "0", trips: "1", terms: "60", amtRec: "1800.00", dateRec: "2023-06-27", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023004", invDate: "2023-04-17", invAmt: "1400.00", invSST: "0.00", containers: "0", trips: "1", terms: "60", amtRec: "1400.00", dateRec: "2023-06-27", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023005", invDate: "2023-05-02", invAmt: "7945.00", invSST: "0.00", containers: "2", trips: "0", terms: "60", amtRec: "7945.00", dateRec: "2023-07-25", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023006", invDate: "2023-05-02", invAmt: "1800.00", invSST: "0.00", containers: "0", trips: "1", terms: "60", amtRec: "1800.00", dateRec: "2023-07-25", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023007", invDate: "2023-05-18", invAmt: "6045.00", invSST: "0.00", containers: "2", trips: "0", terms: "60", amtRec: "6045.00", dateRec: "2023-08-25", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023008", invDate: "2023-05-18", invAmt: "1800.00", invSST: "0.00", containers: "0", trips: "1", terms: "60", amtRec: "1800.00", dateRec: "2023-08-25", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023009", invDate: "2023-06-13", invAmt: "15930.00", invSST: "0.00", containers: "4", trips: "0", terms: "60", amtRec: "15930.00", dateRec: "2023-11-21", remarks: "OWTHE - DONE" },
+        { custName: "MC MULTI SUPPLIES SDN BHD", invNo: "INV-2023010", invDate: "2023-06-13", invAmt: "3600.00", invSST: "0.00", containers: "0", trips: "2", terms: "60", amtRec: "3600.00", dateRec: "2023-08-25", remarks: "OWTHE - DONE" }
+    ];
+
+    let arData = JSON.parse(localStorage.getItem('owth_ar_data'));
+    if (!arData || arData.length === 0) {
+        arData = historicalDefaultRecords;
+        localStorage.setItem('owth_ar_data', JSON.stringify(arData));
+    }
+
     function switchTab(panelId, btn) {
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -409,9 +374,6 @@
         const amt = parseFloat(document.getElementById('invAmt').value) || 0;
         document.getElementById('invSST').value = (amt * 0.06).toFixed(2);
     }
-
-    // --- AR Ledger Mechanics ---
-    let arData = JSON.parse(localStorage.getItem('owth_ar_data')) || [];
 
     function renderARTable() {
         const tbody = document.getElementById('ar-table-body');
@@ -467,9 +429,9 @@
             tbody.appendChild(row);
         });
 
-        document.getElementById('stat-total').innerText = 'RM ' + totalAll.toFixed(2);
-        document.getElementById('stat-received').innerText = 'RM ' + totalRec.toFixed(2);
-        document.getElementById('stat-outstanding').innerText = 'RM ' + totalOut.toFixed(2);
+        document.getElementById('stat-total').innerText = 'RM ' + totalAll.toLocaleString('en-US', {minimumFractionDigits:2});
+        document.getElementById('stat-received').innerText = 'RM ' + totalRec.toLocaleString('en-US', {minimumFractionDigits:2});
+        document.getElementById('stat-outstanding').innerText = 'RM ' + totalOut.toLocaleString('en-US', {minimumFractionDigits:2});
         localStorage.setItem('owth_ar_data', JSON.stringify(arData));
     }
 
@@ -490,55 +452,74 @@
         });
         renderARTable();
         document.getElementById('ar-form').reset();
+        document.getElementById('custName').value = "MC MULTI SUPPLIES SDN BHD";
     }
 
     function deleteRecord(index) {
-        if(confirm('Are you sure you want to delete this invoice record?')) {
+        if(confirm('Are you sure you want to delete this ledger record?')) {
             arData.splice(index, 1);
             renderARTable();
         }
     }
 
-    // 将当前生成的复杂发票总和一键推送到 AR 应收账款账目里
-    function syncToLedger() {
-        const subtotal = parseFloat(document.getElementById('p-subtotal').innerText.replace(/,/g, '')) || 0;
-        const sst = parseFloat(document.getElementById('p-sst').innerText.replace(/,/g, '')) || 0;
-        const invNo = document.getElementById('p-inv-no').innerText;
-        
-        document.getElementById('custName').value = "MC MULTI SUPPLIES SDN BHD";
-        document.getElementById('invNo').value = invNo;
-        document.getElementById('invDate').value = "2026-06-19";
-        document.getElementById('invAmt').value = subtotal.toFixed(2);
-        document.getElementById('invSST').value = sst.toFixed(2);
-        document.getElementById('containers').value = 2; // Based on 2x20GP
-        document.getElementById('trips').value = 0;
-        
-        switchTab('ar-tracker', document.querySelectorAll('.tab-btn')[0]);
-        window.scrollTo({ top: document.getElementById('ar-form').offsetTop, behavior: 'smooth' });
+    function resetToHistoryDefault() {
+        if(confirm('Warning: This will overwrite current entries with the original 2023 CSV historical data. Proceed?')) {
+            arData = [...historicalDefaultRecords];
+            renderARTable();
+        }
     }
 
-    // 高级表格重算引擎：如果你在表格内直接手动改数字，会自动更新最下面的 Subtotal, Tax 和 Grandtotal
+    // --- 动态控制发票项目增删功能 ---
+    function addInvoiceRow() {
+        const tbody = document.getElementById('invoice-items-tbody');
+        const nextNo = tbody.querySelectorAll('tr').length + 1;
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${nextNo}</td>
+            <td>NEW SERVICE DESCRIPTION (Click to edit)</td>
+            <td style="text-align: right;">1.00</td>
+            <td style="text-align: center;">CONT</td>
+            <td style="text-align: center;">MYR</td>
+            <td style="text-align: right;">0.00</td>
+            <td style="text-align: center;">SV06</td>
+            <td style="text-align: right;">0.00</td>
+            <td style="text-align: right; font-weight: bold;">0.00</td>
+        `;
+        tbody.appendChild(tr);
+        recalculateInvoiceTable();
+    }
+
+    function deleteLastInvoiceRow() {
+        const tbody = document.getElementById('invoice-items-tbody');
+        const rows = tbody.querySelectorAll('tr');
+        if(rows.length > 0) {
+            if(confirm(`Remove item row #${rows.length}?`)) {
+                tbody.removeChild(rows[rows.length - 1]);
+                recalculateInvoiceTable();
+            }
+        }
+    }
+
     function recalculateInvoiceTable() {
         const rows = document.querySelectorAll('#invoice-items-tbody tr');
         let totalExcl = 0;
         let totalTax = 0;
 
-        rows.forEach(row => {
+        rows.forEach((row, i) => {
             const cells = row.querySelectorAll('td');
+            cells[0].innerText = i + 1;
+
             if(cells.length >= 9) {
                 const qty = parseFloat(cells[2].innerText) || 0;
                 const unitPrice = parseFloat(cells[5].innerText.replace(/,/g, '')) || 0;
-                const taxCode = cells[6].innerText.trim();
+                const taxCode = cells[6].innerText.trim().toUpperCase();
                 
-                // 自动算出单项总额
                 const amount = qty * unitPrice;
                 cells[8].innerText = amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 
-                // 自动算税
                 let tax = 0;
-                if(taxCode === 'SV06') {
-                    tax = amount * 0.06;
-                }
+                if(taxCode === 'SV06') { tax = amount * 0.06; }
                 cells[7].innerText = tax.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
                 totalExcl += amount;
@@ -547,10 +528,24 @@
         });
 
         const totalIncl = totalExcl + totalTax;
-
         document.getElementById('p-subtotal').innerText = totalExcl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('p-sst').innerText = totalTax.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('p-grand').innerText = totalIncl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function syncToLedger() {
+        const subtotal = parseFloat(document.getElementById('p-subtotal').innerText.replace(/,/g, '')) || 0;
+        const sst = parseFloat(document.getElementById('p-sst').innerText.replace(/,/g, '')) || 0;
+        const invNo = document.getElementById('p-inv-no').innerText;
+        
+        document.getElementById('custName').value = "MC MULTI SUPPLIES SDN BHD";
+        document.getElementById('invNo').value = invNo;
+        document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('invAmt').value = subtotal.toFixed(2);
+        document.getElementById('invSST').value = sst.toFixed(2);
+        
+        switchTab('ar-tracker', document.querySelectorAll('.tab-btn')[0]);
+        window.scrollTo({ top: document.getElementById('ar-form').offsetTop, behavior: 'smooth' });
     }
 
     renderARTable();
